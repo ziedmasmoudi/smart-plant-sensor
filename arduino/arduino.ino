@@ -1,3 +1,9 @@
+//#define TEST
+#ifdef TEST
+#include "./tests/tests.cpp"
+#endif
+#ifndef TEST
+
 #include "DHT.h"
 #include "moisture.h"
 #include "light.h"
@@ -47,3 +53,4 @@ void loop() {
 	}
 
 }
+#endif
