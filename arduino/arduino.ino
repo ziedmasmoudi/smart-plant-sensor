@@ -1,13 +1,16 @@
-#include "dht.h"
+#include "DHT.h"
 #include "moisture.h"
 #include "light.h"
 
 
 #define dhtPin 8
-dht DHT;
+#define dhtType DHT22
+
+DHT dht(dhtPin, dhtType);
 
 void setup() {
 	Serial.begin(9600);
+	dht.begin();
 }
 
 unsigned long previousMillis {0};
@@ -17,13 +20,14 @@ void loop() {
 	unsigned long currentMillis = millis();
 
 	if (currentMillis - previousMillis >= 2000) {
-		int dhtRet = DHT.read(dhtPin);
+		float h = dht.readHumidity();
+		float t = dht.readTemperature();
 
 		Serial.print("Temperature = ");
-		Serial.print(DHT.temperature);
+		Serial.print(t);
 		Serial.println(" C");
 		Serial.print("Humidity = ");
-		Serial.print(DHT.humidity);
+		Serial.print(h);
 		Serial.println(" % ");
 		Serial.println("");
 
