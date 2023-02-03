@@ -1,12 +1,13 @@
 #include <ArduinoBLE.h>
 
-enum charId {temp, humidity, count};
+enum charId {temp, humidity, light,count};
 
 class COMMS {
     
 
-    BLEIntCharacteristic characteristics[2] = { BLEIntCharacteristic("2A57", BLERead | BLEWrite),
-                                              BLEIntCharacteristic("2A58", BLERead | BLEWrite)};
+    BLEIntCharacteristic characteristics[3] = { BLEIntCharacteristic("2A57", BLERead | BLEWrite),
+                                              BLEIntCharacteristic("2A58", BLERead | BLEWrite),
+                                              BLEIntCharacteristic("2A59", BLERead | BLEWrite)};
       
     
     BLEDevice central;

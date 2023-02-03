@@ -4,6 +4,7 @@
 #endif
 #ifndef TEST
 
+#include <Arduino.h>
 #include "DHT.h"
 #include "moisture.h"
 #include "light.h"
@@ -14,14 +15,15 @@
 #define dhtType DHT22
 
 DHT dht(dhtPin, dhtType);
-COMMS comms; 
+COMMS Comms; 
+LIGHT Light;
 
 void setup() {
 	Serial.begin(9600);
 
 	dht.begin();
 
-  	comms.create("aaa");
+  	Comms.create("aaa");
 
 }
 
@@ -29,8 +31,8 @@ unsigned long previousMillis {0};
 unsigned long currentMillis {0};
 
 void loop() {
-	if (!comms.isConnected()){
-		comms.connect();
+	if (!Comms.isConnected()){
+		Comms.connect();
 	}
 
 
@@ -40,6 +42,7 @@ void loop() {
 	if (currentMillis - previousMillis >= 2000) {
 		int h = round(dht.readHumidity()*100);
 		int t = round(dht.readTemperature()*100);
+		int l = Light.getIntensity();
 
 		Serial.print("Temperature = ");
 		Serial.print(t);
@@ -47,9 +50,14 @@ void loop() {
 		Serial.print("Humidity = ");
 		Serial.print(h);
 		Serial.println(" % ");
+		Serial.print("Light Intensity = ");
+		Serial.println(l);
 		Serial.println("");
-    	comms.sendMsg(charId::temp, t);
-		comms.sendMsg(charId::humidity, h);
+
+    	Comms.sendMsg(charId::temp, t);
+		Comms.sendMsg(charId::humidity, h);
+		Comms.sendMsg(charId::light, l);
+
 		previousMillis = currentMillis;
 	}
 
