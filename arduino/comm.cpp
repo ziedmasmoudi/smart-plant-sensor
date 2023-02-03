@@ -8,10 +8,9 @@ int buttonState = 0;
 
 void COMMS::create(char name[10]) {
 
-  BLEService ledService("180A"); // BLE LED Service
+  BLEService sensorService("180A"); // BLE LED Service
 
   // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
-  //switchCharacteristic = switchCharacteristic("2A57", BLERead | BLEWrite);
 
   // begin initialization
   if (!BLE.begin()) {
@@ -22,16 +21,21 @@ void COMMS::create(char name[10]) {
 
   // set advertised local name and service UUID:
   BLE.setLocalName(name);
-  BLE.setAdvertisedService(ledService);
+  BLE.setAdvertisedService(sensorService);
 
-  // add the characteristic to the service
-  ledService.addCharacteristic(switchCharacteristic);
+  // add the characteristics to the service
+  for (int i = 0; i < charId::count; i++){
+    sensorService.addCharacteristic(characteristics[i]);
+  }
+  
 
   // add service
-  BLE.addService(ledService);
+  BLE.addService(sensorService);
 
-  // set the initial value for the characteristic:
-  switchCharacteristic.writeValue(1101214515);
+  // set the initial value for the characteristics:
+  for (int i = 0; i < charId::count; i++){
+    characteristics[i].writeValue(0);
+  }
 
   // start advertising
   BLE.advertise();
@@ -51,15 +55,15 @@ void COMMS::connect() {
   }
 }
 
-void COMMS::sendMsg(uint32_t msg) {
+void COMMS::sendMsg(charId characteristic, uint32_t msg) {
   // if a central is connected to peripheral:
   if (central.connected()) {
-    switchCharacteristic.writeValue(msg);
+    characteristics[characteristic].writeValue(msg);
   }
 }
-void COMMS::readMsg(uint32_t& msg) {
+void COMMS::readMsg(charId characteristic, uint32_t& msg) {
   // if a central is connected to peripheral:
   if (central.connected()) {
-    switchCharacteristic.readValue(msg);
+    characteristics[characteristic].readValue(msg);
   }
 }

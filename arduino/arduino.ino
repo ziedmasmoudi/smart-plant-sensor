@@ -29,7 +29,7 @@ unsigned long previousMillis {0};
 unsigned long currentMillis {0};
 
 void loop() {
-	if (!comms.central.connected()){
+	if (!comms.isConnected()){
 		comms.connect();
 	}
 
@@ -38,7 +38,7 @@ void loop() {
 	unsigned long currentMillis = millis();
 
 	if (currentMillis - previousMillis >= 2000) {
-		float h = dht.readHumidity();
+		int h = round(dht.readHumidity()*100);
 		int t = round(dht.readTemperature()*100);
 
 		Serial.print("Temperature = ");
@@ -48,7 +48,8 @@ void loop() {
 		Serial.print(h);
 		Serial.println(" % ");
 		Serial.println("");
-    	comms.sendMsg(t);
+    	comms.sendMsg(charId::temp, t);
+		comms.sendMsg(charId::humidity, h);
 		previousMillis = currentMillis;
 	}
 
