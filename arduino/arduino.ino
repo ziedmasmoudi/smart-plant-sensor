@@ -64,6 +64,7 @@ void loop() {
     Comms.sendMsg(charId::temp, t);
 		Comms.sendMsg(charId::humidity, h);
 		Comms.sendMsg(charId::light, l);
+    Comms.sendMsg(charId::moisture, m);
 
 		previousMillis = currentMillis;
 	}
