@@ -1,4 +1,3 @@
-
 //based on code from https://docs.arduino.cc/tutorials/nano-33-iot/bluetooth by Fabricio Troya
 
 #include <ArduinoBLE.h>
@@ -6,11 +5,8 @@
 
 int buttonState = 0;
 
-void COMMS::create(char name[10]) {
-
+bool COMMS::create(char name[10]) {
   BLEService sensorService("180A"); // BLE LED Service
-
-  // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
 
   // begin initialization
   if (!BLE.begin()) {
@@ -27,7 +23,6 @@ void COMMS::create(char name[10]) {
   for (int i = 0; i < charId::count; i++){
     sensorService.addCharacteristic(characteristics[i]);
   }
-  
 
   // add service
   BLE.addService(sensorService);
@@ -41,6 +36,8 @@ void COMMS::create(char name[10]) {
   BLE.advertise();
 
   Serial.println("BLE LED Peripheral");
+
+  return true;
 }
 
 void COMMS::connect() {
@@ -61,6 +58,7 @@ void COMMS::sendMsg(charId characteristic, uint32_t msg) {
     characteristics[characteristic].writeValue(msg);
   }
 }
+
 void COMMS::readMsg(charId characteristic, uint32_t& msg) {
   // if a central is connected to peripheral:
   if (central.connected()) {
