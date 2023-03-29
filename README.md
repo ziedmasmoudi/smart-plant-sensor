@@ -2,13 +2,13 @@
 
 ## Table of Content:
 
-- [Project Status](#Project-Status:)
-- [Project Overview](#Project-Overview:)
-- [Features](#Features:)
-- [Photos/Screenshots](#Photos/Screenshots:)
-- [Technologies](#Technologies:)
-- [Acknowledgments](#Acknowledgments:)
-- [License](#License:)
+- [Project Status](#Project-Status)
+- [Project Overview](#Project-Overview)
+- [Features](#Features)
+- [Photos/Screenshots](#Photos/Screenshots)
+- [Technologies](#Technologies)
+- [Acknowledgments](#Acknowledgments)
+- [License](#License)
 
 ## Project Status:
 Mirabilis is currently in the early development stage. A working prototype for the hardware part of the solution has been developed, which can record data and send it periodically over a Bluetooth Low Energy service. The data can be read using an app like LightBlue and can also be sent to a connected computer over Serial.
