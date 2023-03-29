@@ -34,6 +34,8 @@ Mirabilis is a smart plant care system designed to help everyone develop a green
 
 
 ## Acknowledgments:
+- Reading data from the DHT22 using [DHTlib library](https://github.com/RobTillaart/DHTlib) by Rob Tillaart 
+- Using the onboard BLE module using [ArduinoBLE library](https://github.com/arduino-libraries/ArduinoBLE) with guidance from this [tutorial](https://docs.arduino.cc/tutorials/nano-33-iot/bluetooth) by Arduino
 
 ## License:
 MIT license @ziedmasmoudi
