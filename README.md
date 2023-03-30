@@ -25,6 +25,8 @@ Mirabilis is a smart plant care system designed to help everyone develop a green
 
 ## Photos/Screenshots:
 ![](documentation/IMG_5669.jpg)
+![](documentation/Screenshot 2023-03-30 173716.png)
+![](documentation/IMG_5708.jpg)
 
 ## Technologies:
 - Arduino
