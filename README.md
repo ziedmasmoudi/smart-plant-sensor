@@ -1,43 +1,53 @@
-# Mirabilis - Giving everyone a green thumb
+| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 | Linux |
+| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- | -------- | ----- |
 
-## Table of Content:
+# Hello World Example
 
-- [Project Status](#Project-Status)
-- [Project Overview](#Project-Overview)
-- [Features](#Features)
-- [Photos/Screenshots](#Photos/Screenshots)
-- [Technologies](#Technologies)
-- [Acknowledgments](#Acknowledgments)
-- [License](#License)
+Starts a FreeRTOS task to print "Hello World".
 
-## Project Status:
-Mirabilis is currently in the early development stage. A working prototype for the hardware part of the solution has been developed, which can record data and send it periodically over a Bluetooth Low Energy service. The data can be read using an app like LightBlue and can also be sent to a connected computer over Serial.
+(See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-The next steps for the project include adding a solar cell and battery to make the sensor wireless and implementing a prototype of the mobile app to receive and display the data from the plant sensor.
+## How to use example
 
-## Project Overview:
-Mirabilis is a smart plant care system designed to help everyone develop a green thumb. It consists of a physical connected sensor that collects data from various environmental sensors such as air temperature, air humidity, sunlight intensity, and soil moisture. The sensor sends this information to a mobile app on the user's phone, which compiles and presents the data in an easy-to-understand format.
+Follow detailed instructions provided specifically for this example.
 
-## Features:
-- **Environmental Sensors:** Mirabilis includes a range of sensors such as air temperature, air humidity, sunlight intensity, and soil moisture sensors, to gather data on the plant's surroundings.
-- **Real-Time Monitoring:** With Mirabilis, users can monitor the health of their plants in real-time, ensuring they catch any issues before they become a bigger problem.
-- **Guidance on Plant Care:** The app will provide guidance on how to best care for the plant based on the data collected by the sensor, helping users take care of their plants more effectively.
+Select the instructions depending on Espressif chip installed on your development board:
 
-## Photos/Screenshots:
-![](documentation/IMG_5669.jpg)
-![](documentation/Screenshot2023-03-306.png)
-![](documentation/IMG_5708.jpg)
-
-## Technologies:
-- Arduino
-- BLE
-- LightBlue
-- KiCAD
+- [ESP32 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started/index.html)
+- [ESP32-S2 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
 
 
-## Acknowledgments:
-- Reading data from the DHT22 using [DHTlib library](https://github.com/RobTillaart/DHTlib) by Rob Tillaart 
-- Using the onboard BLE module using [ArduinoBLE library](https://github.com/arduino-libraries/ArduinoBLE) with guidance from this [tutorial](https://docs.arduino.cc/tutorials/nano-33-iot/bluetooth) by Arduino
+## Example folder contents
 
-## License:
-MIT license @ziedmasmoudi
+The project **hello_world** contains one source file in C language [hello_world_main.c](main/hello_world_main.c). The file is located in folder [main](main).
+
+ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt` files that provide set of directives and instructions describing the project's source files and targets (executable, library, or both).
+
+Below is short explanation of remaining files in the project folder.
+
+```
+├── CMakeLists.txt
+├── pytest_hello_world.py      Python script used for automated testing
+├── main
+│   ├── CMakeLists.txt
+│   └── hello_world_main.c
+└── README.md                  This is the file you are currently reading
+```
+
+For more information on structure and contents of ESP-IDF projects, please refer to Section [Build System](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html) of the ESP-IDF Programming Guide.
+
+## Troubleshooting
+
+* Program upload failure
+
+    * Hardware connection is not correct: run `idf.py -p PORT monitor`, and reboot your board to see if there are any output logs.
+    * The baud rate for downloading is too high: lower your baud rate in the `menuconfig` menu, and try again.
+
+## Technical support and feedback
+
+Please use the following feedback channels:
+
+* For technical queries, go to the [esp32.com](https://esp32.com/) forum
+* For a feature request or bug report, create a [GitHub issue](https://github.com/espressif/esp-idf/issues)
+
+We will get back to you as soon as possible.
