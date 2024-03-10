@@ -14,5 +14,9 @@
     "idf.portWin": "COM9",
     "idf.pythonBinPathWin": "C:\\Users\\Lenovo\\.espressif\\python_env\\idf5.2_py3.11_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\Lenovo\\.espressif",
-    "idf.flashType": "UART"
+    "idf.flashType": "UART",
+    "files.associations": {
+        "sdkconfig.h": "c",
+        "inttypes.h": "c"
+    }
 }

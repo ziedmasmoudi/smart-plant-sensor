@@ -7,6 +7,8 @@
 #include "freertos/task.h"
 #include "driver/i2c_master.h"
 
+#include "AHT20.h"
+
 #define I2C_MASTER_SCL_IO           11                      /* GPIO number used for I2C master clock */
 #define I2C_MASTER_SDA_IO           10                      /* GPIO number used for I2C master data  */
 #define I2C_MASTER_PORT             0                       /* Sets the I2C port used by the controller */
@@ -23,9 +25,21 @@ void sensors_task(void *pvParameter)
     i2c_master_bus_handle_t bus_handle;
     i2c_init(&bus_handle);
 
+    i2c_master_dev_handle_t AHT20_handle;
+    AHT20_init(&bus_handle, &AHT20_handle);
+
+    vTaskDelay( 40 / portTICK_PERIOD_MS );
+    
     while (1)
     {
+        uint8_t temperature;
+        AHT20_read_temperature(&AHT20_handle, &temperature);
+        ESP_LOGI(TAG, "Temperature: %iC", temperature);
+        uint8_t humidity;
+        AHT20_read_humidity(&AHT20_handle, &humidity);
+        ESP_LOGI(TAG, "Humidity: %i%%", humidity);
 
+        vTaskDelay( 500 / portTICK_PERIOD_MS );
     }
     vTaskDelete(NULL);
 }
