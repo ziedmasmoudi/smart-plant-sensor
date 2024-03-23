@@ -16,8 +16,6 @@
 #include "sensors_task.h"
 #include "communications_task.h"
 
-#include "bluetooth.h"
-
 static const char *TAG = __FILE__;
 
 void app_main(void)
