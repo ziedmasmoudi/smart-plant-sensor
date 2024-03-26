@@ -12,22 +12,22 @@
 #include "services/gap/ble_svc_gap.h"
 #include "blehr_sens.h"
 
-static const char *tag = "NimBLE_BLE_HeartRate";
+static const char *TAG = __FILE__;
 
-static TimerHandle_t blehr_tx_timer;
+static TimerHandle_t ble_tx_timer;
 
 static bool notify_state;
 
 static uint16_t conn_handle;
 
-static const char *device_name = "blehr_sensor_1.0";
+static const char *device_name = "smart-plant-sensor";
 
 static int blehr_gap_event(struct ble_gap_event *event, void *arg);
 
-static uint8_t blehr_addr_type;
+static uint8_t ble_addr_type;
 
-/* Variable to simulate heart beats */
-static uint8_t heartrate = 90;
+/* Variable to simulate temperature */
+static uint8_t temperature = 90;
 
 /**
  * Utility function to log an array of bytes.
@@ -102,7 +102,7 @@ blehr_advertise(void)
     memset(&adv_params, 0, sizeof(adv_params));
     adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    rc = ble_gap_adv_start(blehr_addr_type, NULL, BLE_HS_FOREVER,
+    rc = ble_gap_adv_start(ble_addr_type, NULL, BLE_HS_FOREVER,
                            &adv_params, blehr_gap_event, NULL);
     if (rc != 0) {
         MODLOG_DFLT(ERROR, "error enabling advertisement; rc=%d\n", rc);
@@ -111,18 +111,18 @@ blehr_advertise(void)
 }
 
 static void
-blehr_tx_hrate_stop(void)
+ble_tx_temperature_stop(void)
 {
-    xTimerStop( blehr_tx_timer, 1000 / portTICK_PERIOD_MS );
+    xTimerStop( ble_tx_timer, 1000 / portTICK_PERIOD_MS );
 }
 
-/* Reset heart rate measurement */
+/* Reset temperature measurement */
 static void
-blehr_tx_hrate_reset(void)
+ble_tx_temperature_reset(void)
 {
     int rc;
 
-    if (xTimerReset(blehr_tx_timer, 1000 / portTICK_PERIOD_MS ) == pdPASS) {
+    if (xTimerReset(ble_tx_timer, 1000 / portTICK_PERIOD_MS ) == pdPASS) {
         rc = 0;
     } else {
         rc = 1;
@@ -132,35 +132,35 @@ blehr_tx_hrate_reset(void)
 
 }
 
-/* This function simulates heart beat and notifies it to the client */
+/* This function simulates temperature and notifies it to the client */
 static void
-blehr_tx_hrate(TimerHandle_t ev)
+ble_tx_temperature(TimerHandle_t ev)
 {
-    static uint8_t hrm[2];
+    static uint8_t temperature_measurment[2];
     int rc;
     struct os_mbuf *om;
 
     if (!notify_state) {
-        blehr_tx_hrate_stop();
-        heartrate = 90;
+        ble_tx_temperature_stop();
+        temperature = 90;
         return;
     }
 
-    hrm[0] = 0x06; /* contact of a sensor */
-    hrm[1] = heartrate; /* storing dummy data */
+    temperature_measurment[0] = 0x06; /* contact of a sensor */
+    temperature_measurment[1] = temperature; /* storing dummy data */
 
-    /* Simulation of heart beats */
-    heartrate++;
-    if (heartrate == 160) {
-        heartrate = 90;
+    /* Simulation of temperature */
+    temperature++;
+    if (temperature == 160) {
+        temperature = 90;
     }
 
-    om = ble_hs_mbuf_from_flat(hrm, sizeof(hrm));
-    rc = ble_gatts_notify_custom(conn_handle, hrs_hrm_handle, om);
+    om = ble_hs_mbuf_from_flat(temperature_measurment, sizeof(temperature_measurment));
+    rc = ble_gatts_notify_custom(conn_handle, es_temp_handle, om);
 
     assert(rc == 0);
 
-    blehr_tx_hrate_reset();
+    ble_tx_temperature_reset();
 }
 
 static int
@@ -195,13 +195,13 @@ blehr_gap_event(struct ble_gap_event *event, void *arg)
     case BLE_GAP_EVENT_SUBSCRIBE:
         MODLOG_DFLT(INFO, "subscribe event; cur_notify=%d\n value handle; "
                     "val_handle=%d\n",
-                    event->subscribe.cur_notify, hrs_hrm_handle);
-        if (event->subscribe.attr_handle == hrs_hrm_handle) {
+                    event->subscribe.cur_notify, es_temp_handle);
+        if (event->subscribe.attr_handle == es_temp_handle) {
             notify_state = event->subscribe.cur_notify;
-            blehr_tx_hrate_reset();
-        } else if (event->subscribe.attr_handle != hrs_hrm_handle) {
+            ble_tx_temperature_reset();
+        } else if (event->subscribe.attr_handle != es_temp_handle) {
             notify_state = event->subscribe.cur_notify;
-            blehr_tx_hrate_stop();
+            ble_tx_temperature_stop();
         }
         ESP_LOGI("BLE_GAP_SUBSCRIBE_EVENT", "conn_handle from subscribe=%d", conn_handle);
         break;
@@ -222,11 +222,11 @@ blehr_on_sync(void)
 {
     int rc;
 
-    rc = ble_hs_id_infer_auto(0, &blehr_addr_type);
+    rc = ble_hs_id_infer_auto(0, &ble_addr_type);
     assert(rc == 0);
 
     uint8_t addr_val[6] = {0};
-    rc = ble_hs_id_copy_addr(blehr_addr_type, addr_val, NULL);
+    rc = ble_hs_id_copy_addr(ble_addr_type, addr_val, NULL);
 
     MODLOG_DFLT(INFO, "Device Address: ");
     print_addr(addr_val);
@@ -244,7 +244,7 @@ blehr_on_reset(int reason)
 
 void blehr_host_task(void *param)
 {
-    ESP_LOGI(tag, "BLE Host Task Started");
+    ESP_LOGI(TAG, "BLE Host Task Started");
     /* This function will return only when nimble_port_stop() is executed */
     nimble_port_run();
 
@@ -274,7 +274,7 @@ esp_err_t bluetooth_init(void)
     ble_hs_cfg.reset_cb = blehr_on_reset;
 
     /* name, period/time,  auto reload, timer ID, callback */
-    blehr_tx_timer = xTimerCreate("blehr_tx_timer", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, blehr_tx_hrate);
+    ble_tx_timer = xTimerCreate("ble_tx_timer", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, ble_tx_temperature);
 
     rc = gatt_svr_init();
     assert(rc == 0);

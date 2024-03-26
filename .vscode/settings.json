@@ -17,6 +17,8 @@
     "idf.flashType": "UART",
     "files.associations": {
         "sdkconfig.h": "c",
-        "inttypes.h": "c"
+        "inttypes.h": "c",
+        "modlog.h": "c",
+        "sensors_task.h": "c"
     }
 }
