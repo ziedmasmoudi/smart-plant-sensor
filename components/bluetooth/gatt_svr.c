@@ -28,10 +28,35 @@
 
 static const char *manuf_name = "Mirabilis";
 static const char *model_num = "Smart Plant Sensor";
+
+// from Environmental Sensing Service Specification V1.0.0
+typedef struct __attribute__((packed)) 
+{
+    uint16_t flags;
+    uint8_t sampling_function;
+    uint8_t measurement_period[3];
+    uint8_t update_interval[3];
+    uint8_t application;
+    uint8_t uncertainty;
+} ess_measurement_dsc_t;
+
+ess_measurement_dsc_t ess_measurement_dsc_temperature = {
+    .flags = 0,
+    .sampling_function = 0x01, // Instantaneous
+    .measurement_period = {0},
+    .update_interval = {0},
+    .application = 0x13, // Outdoor
+    .uncertainty = 0xFF, // Information not available
+};
+
 uint16_t es_temp_handle;
 
 static int
 gatt_svr_chr_access_temperature(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg);
+
+static int
+gatt_svr_dsc_access(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static int
@@ -44,12 +69,24 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
         .uuid = BLE_UUID16_DECLARE(GATT_ES_UUID),
         .characteristics = (struct ble_gatt_chr_def[])
-        { {
+        { 
+            {
                 /* Characteristic: Temperature measurement */
                 .uuid = BLE_UUID16_DECLARE(GATT_ES_TEMPERATURE_UUID),
                 .access_cb = gatt_svr_chr_access_temperature,
                 .val_handle = &es_temp_handle,
                 .flags = BLE_GATT_CHR_F_NOTIFY,
+                .descriptors = (struct ble_gatt_dsc_def[])
+                {   
+                    {
+                        /* Environmental Sensing Measurement */
+                        .uuid = BLE_UUID16_DECLARE(GATT_ES_TEMPERATURE_MEASUREMENT_UUID),
+                        .att_flags = BLE_ATT_F_READ,
+                        .access_cb = gatt_svr_dsc_access,
+                    }, {
+                        0, /* No more descriptors in this characteristic */
+                    }
+                }
             }, {
                 0, /* No more characteristics in this service */
             },
@@ -87,6 +124,37 @@ gatt_svr_chr_access_temperature(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
     return 0;
+}
+
+static int
+gatt_svr_dsc_access(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    uint16_t uuid;
+    esp_err_t rc = 0;
+
+    uuid = ble_uuid_u16(ctxt->chr->uuid);
+    switch (ctxt->op) {
+        case BLE_GATT_ACCESS_OP_READ_DSC:
+            if (conn_handle != BLE_HS_CONN_HANDLE_NONE) {
+                MODLOG_DFLT(INFO, "Descriptor read; conn_handle=%d attr_handle=%d\n",
+                            conn_handle, attr_handle);
+            } else {
+                MODLOG_DFLT(INFO, "Descriptor read by NimBLE stack; attr_handle=%d\n",
+                            attr_handle);
+            }
+
+            if (uuid == GATT_ES_TEMPERATURE_MEASUREMENT_UUID) {
+                rc = os_mbuf_append(ctxt->om,
+                                    &ess_measurement_dsc_temperature,
+                                    sizeof(ess_measurement_dsc_temperature));
+                return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
+            }
+            break;
+        default:
+            break;
+    }
+    return rc;
 }
 
 static int

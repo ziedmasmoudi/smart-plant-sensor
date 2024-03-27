@@ -6,6 +6,7 @@
 /* Environmental Sensing configuration */
 #define GATT_ES_UUID                            0x181A
 #define GATT_ES_TEMPERATURE_UUID                0x181A
+#define GATT_ES_TEMPERATURE_MEASUREMENT_UUID    0x290C
 #define GATT_DEVICE_INFO_UUID                   0x180A
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
 #define GATT_MODEL_NUMBER_UUID                  0x2A24
